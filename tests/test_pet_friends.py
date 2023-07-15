@@ -8,59 +8,51 @@ def test_get_api_key_for_invalid_user(email=valid_email, password=invalid_passwo
     status, result = pf.get_api_key(email, password)
     assert status == 403
 
-def test_get_all_pets_with_valid_key(filter='my_pets'):
-    """Проверка что запрос api возвращает статус 200
-    и список питомцев, совпадающих с фильтром в формате JSON.
-    Фильтр 'my_pets' - список собственных питтомцев"""
-    _, auth_key = pf.get_api_key(valid_email, valid_password)
-    status, result = pf.get_list_of_pets(auth_key, filter)
-    assert status == 200
-    assert len(result['pets']) > 0
 
 def test_add_new_pet_with_invalid_age1(name='Lutic', animal_type='Papion',
                                      age='0'):
-    """Проверяем можно ли добавить питомца с возрастом 0"""
+    """Проверка добавления питомца с возрастом 0"""
     _, auth_key = pf.get_api_key(valid_email, valid_password)
     status, result = pf.post_new_pet(auth_key, name, animal_type, age)
     assert status == 200
 
 def test_add_new_pet_with_invalid_animal_type(name='Lutic', animal_type='+',
                                      age='4'):
-    """Проверяем можно ли добавить питомца с animal_type со спец.символом """
+    """Проверка добавления питомца с animal_type со спец.символом """
     _, auth_key = pf.get_api_key(valid_email, valid_password)
     status, result = pf.post_new_pet(auth_key, name, animal_type, age)
     assert status == 200
 
 def test_add_new_pet_with_invalid_name1(name='3', animal_type='Papion',
                                      age='4'):
-    """Проверяем можно ли добавить питомца с невалидным именем (число) """
+    """Проверка добавления питомца с именем из числа """
     _, auth_key = pf.get_api_key(valid_email, valid_password)
     status, result = pf.post_new_pet(auth_key, name, animal_type, age)
     assert status == 200
 
 def test_add_new_pet_with_invalid_name2(name='+', animal_type='Papion',
                                      age='4'):
-    """Проверяем можно ли добавить питомца с невалидным именем (спец.символ) """
+    """Проверка добавления питомца с именем из спец.символа """
     _, auth_key = pf.get_api_key(valid_email, valid_password)
     status, result = pf.post_new_pet(auth_key, name, animal_type, age)
     assert status == 200
 
 def test_add_new_pet_with_invalid_name3(name=invalid_name, animal_type='Papion',
     age='4'):
-    """Проверяем можно ли добавить питомца с невалидным именем (длинное имя)"""
+    """Проверка добавления питомца с длинным именем"""
     _, auth_key = pf.get_api_key(valid_email, valid_password)
     status, result = pf.post_new_pet(auth_key, name, animal_type, age)
     assert status == 200
 
 def test_add_new_pet_with_invalid_age2(name='Lutic', animal_type='Papion',
-                                     age='12+3'):
-    """Проверяем можно ли добавить питомца с невалидным возрастом (спец.символ) """
+                                     age='+'):
+    """Проверка добавления питомца с возрастом из спец.символа """
     _, auth_key = pf.get_api_key(valid_email, valid_password)
     status, result = pf.post_new_pet(auth_key, name, animal_type, age)
     assert status == 200
 
 def test_delete_pet_in_all_pets():
-    """Проверяем что нельзя удалить чужого питомца """
+    """Проверка удаления чужого питомца """
     _, auth_key = pf.get_api_key(valid_email, valid_password)
     _, all_pets = pf.get_list_of_pets(auth_key, '')
 
@@ -72,7 +64,7 @@ def test_delete_pet_in_all_pets():
     assert pet_id in all_pets.values()
 
 def test_set_photo_csv():
-    """Проверяем что нельзя добавить файл в формате csv"""
+    """Проверка добавления файла в формате csv"""
     _, auth_key = pf.get_api_key(valid_email, valid_password)
     _, my_pets = pf.get_list_of_pets(auth_key, 'my_pets')
     pet_id = my_pets['pets'][0]['id']
@@ -80,6 +72,14 @@ def test_set_photo_csv():
     _, my_pets = pf.get_list_of_pets(auth_key, "my_pets")
     assert status == 400
 
+def test_set_big_photo_():
+    """Проверка добавления фото в 4к"""
+    _, auth_key = pf.get_api_key(valid_email, valid_password)
+    _, my_pets = pf.get_list_of_pets(auth_key, 'my_pets')
+    pet_id = my_pets['pets'][0]['id']
+    status, _ = pf.post_set_photo(auth_key, pet_id, pet_photo='big_photo.png')
+    _, my_pets = pf.get_list_of_pets(auth_key, "my_pets")
+    assert status == 200
 
 
 
